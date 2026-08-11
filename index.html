@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Forja — Bitácora Personal</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#161F36">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Forja">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root{
+  --navy:#161F36;
+  --navy-2:#1F2C4C;
+  --navy-3:#28375E;
+  --parchment:#F2EAD3;
+  --parchment-dim:#D9CFAF;
+  --gold:#C9A227;
+  --gold-light:#E4C766;
+  --stamp:#A6342B;
+  --stamp-light:#C85A48;
+  --text:#EDE6D6;
+  --muted:#8E9AB8;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+body{margin:0; background:var(--navy); color:var(--text); font-family:'Inter',sans-serif; min-height:100vh;}
+.wrap{max-width:480px; margin:0 auto; padding:20px 16px 40px; min-height:100vh; display:flex; flex-direction:column;}
+
+header{border-bottom:1px solid var(--navy-3); padding-bottom:16px; margin-bottom:18px;}
+.eyebrow{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; color:var(--gold); text-transform:uppercase;}
+h1{font-family:'Fraunces',serif; font-weight:700; font-size:34px; margin:4px 0 2px; color:var(--parchment); letter-spacing:-.01em;}
+.expediente-no{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--muted);}
+
+.totalbar{display:flex; align-items:baseline; justify-content:space-between; margin-top:14px;}
+.totalbar .label{font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em;}
+.totalbar .points{font-family:'JetBrains Mono',monospace; font-size:22px; font-weight:600; color:var(--gold-light);}
+
+.chatbox{background:var(--navy-2); border:1px solid var(--navy-3); border-radius:10px; padding:10px; margin-bottom:18px;}
+.chatrow{display:flex; gap:8px;}
+#msgInput{flex:1; background:var(--navy); border:1px solid var(--navy-3); border-radius:8px; color:var(--text); font-family:'Inter',sans-serif; font-size:15px; padding:11px 12px; outline:none;}
+#msgInput:focus{border-color:var(--gold);}
+#micBtn, #sendBtn{border:none; border-radius:8px; font-family:'Inter',sans-serif; font-size:14px; cursor:pointer;}
+#micBtn{background:var(--navy); border:1px solid var(--navy-3); color:var(--parchment); width:44px; font-size:18px;}
+#micBtn.listening{background:var(--stamp); border-color:var(--stamp);}
+#sendBtn{background:var(--gold); color:var(--navy); font-weight:600; padding:0 16px;}
+.hint{font-size:11px; color:var(--muted); margin-top:8px; line-height:1.4;}
+
+.log{display:flex; flex-direction:column; gap:6px; max-height:180px; overflow-y:auto; margin-bottom:20px; padding-right:2px;}
+.log:empty{display:none;}
+.logline{font-size:13px; color:var(--parchment-dim); display:flex; gap:8px; align-items:baseline;}
+.logline .n{font-family:'JetBrains Mono',monospace; color:var(--gold); font-size:11px; flex-shrink:0;}
+.logline .t{font-family:'JetBrains Mono',monospace; color:var(--muted); font-size:11px; flex-shrink:0;}
+
+.section-title{font-family:'Fraunces',serif; font-size:15px; color:var(--gold-light); margin:0 0 10px; letter-spacing:.02em;}
+
+.habits{display:flex; flex-direction:column; gap:8px; margin-bottom:24px;}
+.habit{position:relative; display:flex; align-items:center; gap:12px; background:var(--navy-2); border:1px solid var(--navy-3); border-radius:9px; padding:12px 12px; cursor:pointer; overflow:hidden; transition:border-color .2s;}
+.habit.done{border-color:var(--gold);}
+.stampzone{width:38px; height:38px; flex-shrink:0; display:flex; align-items:center; justify-content:center; position:relative;}
+.stamp{width:34px; height:34px; border-radius:50%; border:2.5px solid var(--stamp); color:var(--stamp); display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; opacity:0; transform:scale(1.8) rotate(-14deg); transition:none;}
+.habit.done .stamp{opacity:1; animation:stampdown .32s cubic-bezier(.2,1.4,.4,1) forwards;}
+.stampzone::before{content:''; position:absolute; width:30px; height:30px; border-radius:50%; border:1.5px dashed var(--navy-3); }
+@keyframes stampdown{0%{opacity:0; transform:scale(2.1) rotate(-18deg);} 60%{opacity:1; transform:scale(.9) rotate(-6deg);} 100%{opacity:1; transform:scale(1) rotate(-8deg);}}
+.habit-info{flex:1; min-width:0;}
+.habit-name{font-size:14.5px; font-weight:500; color:var(--text);}
+.habit-sub{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--muted); margin-top:1px;}
+.habit-pts{font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--gold); font-weight:600; flex-shrink:0;}
+
+.sleep-row{background:var(--navy-2); border:1px solid var(--navy-3); border-radius:9px; padding:12px; margin-bottom:24px; display:flex; align-items:center; gap:12px;}
+.sleep-row .habit-info{flex:1;}
+.sleep-val{font-family:'JetBrains Mono',monospace; font-size:20px; color:var(--gold-light); font-weight:600;}
+
+.bitacora{margin-top:auto;}
+.rings{display:grid; grid-template-columns:repeat(7,1fr); gap:8px; margin-top:10px;}
+.ring-day{aspect-ratio:1; border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative;}
+.ring-day svg{width:100%; height:100%; transform:rotate(-90deg);}
+.ring-day .lbl{position:absolute; font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--muted);}
+
+footer{margin-top:24px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--navy-3);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Bitácora Personal</div>
+    <h1>Forja</h1>
+    <div class="expediente-no" id="expNo">Exp. —</div>
+    <div class="totalbar">
+      <div><div class="label">Puntos de hoy</div></div>
+      <div class="points" id="todayPoints">0 / 90</div>
+    </div>
+  </header>
+
+  <div class="chatbox">
+    <div class="chatrow">
+      <button id="micBtn" title="Dictar">🎙️</button>
+      <input id="msgInput" type="text" placeholder="Declara lo que hiciste…" autocomplete="off">
+      <button id="sendBtn">Asentar</button>
+    </div>
+    <div class="hint">Toca el 🎙️ del teclado de tu teléfono para dictar, o escribe. Ej: "ya hice ejercicio", "dormí 7 horas", "ya desayuné".</div>
+  </div>
+
+  <div class="log" id="log"></div>
+
+  <div class="section-title">Actuaciones del día</div>
+  <div class="habits" id="habits"></div>
+
+  <div class="sleep-row">
+    <div class="habit-info">
+      <div class="habit-name">Sueño</div>
+      <div class="habit-sub" id="sleepSub">sin registrar</div>
+    </div>
+    <div class="sleep-val" id="sleepVal">—</div>
+  </div>
+
+  <div class="bitacora">
+    <div class="section-title">Bitácora — últimos 21 días</div>
+    <div class="rings" id="rings"></div>
+  </div>
+
+  <footer>BAUGH · FORJA · REGISTRO PRIVADO</footer>
+</div>
+
+<script>
+const HABITS = [
+  {id:'ejercicio', label:'Ejercicio', points:20, kw:['ejercicio','entrene','entrené','gym','pesas','cardio','rutina de','press banca','entrenar']},
+  {id:'sinergeticos', label:'Clase Sinergéticos', points:15, kw:['sinergeticos','sinergética','sinergetico','clase']},
+  {id:'lectura', label:'Lectura', points:10, kw:['lei','leí','lectura','libro']},
+  {id:'meditacion', label:'Meditación', points:10, kw:['medite','medité','meditacion','meditación','medité']},
+  {id:'idiomas', label:'Idiomas', points:10, kw:['idioma','ingles','inglés','aleman','alemán','frances','francés']},
+  {id:'desayuno', label:'Desayuno', points:5, kw:['desayune','desayuné','desayuno','desayunar']},
+  {id:'comida', label:'Comida', points:5, kw:['comi','comí','comida','almorce','almorcé','almuerzo']},
+  {id:'arreglo', label:'Arreglo personal', points:5, kw:['arregle','arreglé','bane','bañé','arreglo personal','me arregle','me arreglé']},
+];
+const SLEEP_MAX = 10;
+const MAX_TOTAL = HABITS.reduce((s,h)=>s+h.points,0) + SLEEP_MAX;
+
+function norm(s){
+  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+}
+function todayKey(d=new Date()){
+  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+function keyFor(offset){
+  const d=new Date(); d.setDate(d.getDate()-offset); return todayKey(d);
+}
+
+let state = {habitsDone:{}, sleepHours:null, points:0, messages:[]};
+const dayKey = todayKey();
+
+async function loadDay(key){
+  try{
+    const raw = localStorage.getItem('log:'+key);
+    return raw ? JSON.parse(raw) : {habitsDone:{}, sleepHours:null, points:0, messages:[]};
+  }catch(e){
+    return {habitsDone:{}, sleepHours:null, points:0, messages:[]};
+  }
+}
+async function saveDay(key, data){
+  try{
+    localStorage.setItem('log:'+key, JSON.stringify(data));
+  }catch(e){
+    console.error('No se pudo guardar', e);
+  }
+}
+
+function recalcPoints(){
+  let p = 0;
+  HABITS.forEach(h=>{ if(state.habitsDone[h.id]) p += h.points; });
+  if(state.sleepHours !== null){
+    p += 5;
+    if(state.sleepHours >= 7) p += 5;
+  }
+  state.points = p;
+}
+
+function renderHeader(){
+  document.getElementById('expNo').textContent = 'Forja No. ' + dayKey.replace(/-/g,'/');
+  document.getElementById('todayPoints').textContent = state.points + ' / ' + MAX_TOTAL;
+}
+
+function renderHabits(){
+  const el = document.getElementById('habits');
+  el.innerHTML = '';
+  HABITS.forEach(h=>{
+    const done = !!state.habitsDone[h.id];
+    const row = document.createElement('div');
+    row.className = 'habit' + (done ? ' done' : '');
+    row.innerHTML = `
+      <div class="stampzone"><div class="stamp">✓</div></div>
+      <div class="habit-info">
+        <div class="habit-name">${h.label}</div>
+        <div class="habit-sub">${done ? 'sellado hoy' : 'pendiente'}</div>
+      </div>
+      <div class="habit-pts">+${h.points}</div>
+    `;
+    row.addEventListener('click', ()=> toggleHabit(h.id));
+    el.appendChild(row);
+  });
+
+  const sub = document.getElementById('sleepSub');
+  const val = document.getElementById('sleepVal');
+  if(state.sleepHours !== null){
+    sub.textContent = (state.sleepHours >= 7 ? 'meta cumplida · +10' : 'registrado · +5');
+    val.textContent = state.sleepHours + 'h';
+  } else {
+    sub.textContent = 'sin registrar';
+    val.textContent = '—';
+  }
+}
+
+function renderLog(){
+  const el = document.getElementById('log');
+  el.innerHTML = state.messages.map((m,i)=>`
+    <div class="logline"><span class="n">${String(i+1).padStart(2,'0')}</span><span class="t">${m.time}</span><span>${m.text}</span></div>
+  `).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+async function toggleHabit(id, fromParse=false){
+  const wasDone = !!state.habitsDone[id];
+  if(fromParse && wasDone) return false; // ya sellado hoy, no duplicar
+  state.habitsDone[id] = !wasDone;
+  recalcPoints();
+  renderHeader(); renderHabits();
+  await saveDay(dayKey, state);
+  return true;
+}
+
+async function setSleep(hours){
+  state.sleepHours = hours;
+  recalcPoints();
+  renderHeader(); renderHabits();
+  await saveDay(dayKey, state);
+}
+
+function pushLog(text){
+  const now = new Date();
+  const time = String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  state.messages.push({text, time});
+  renderLog();
+}
+
+async function handleMessage(raw){
+  const text = raw.trim();
+  if(!text) return;
+  const n = norm(text);
+  let matched = [];
+
+  for(const h of HABITS){
+    if(h.kw.some(k=>n.includes(norm(k)))){
+      const changed = await toggleHabit(h.id, true);
+      if(changed) matched.push(h.label);
+    }
+  }
+
+  const sleepMatch = n.match(/(\d{1,2}(?:\.\d)?)\s*(?:h|hr|hora|horas)/);
+  if(sleepMatch && (n.includes('dormi') || n.includes('sueno') || n.includes('dormir'))){
+    const hrs = parseFloat(sleepMatch[1]);
+    if(!isNaN(hrs) && hrs > 0 && hrs <= 16){
+      await setSleep(hrs);
+      matched.push('Sueño: ' + hrs + 'h');
+    }
+  }
+
+  if(matched.length){
+    pushLog('"' + text + '" → sellado: ' + matched.join(', '));
+    await saveDay(dayKey, state);
+  } else {
+    pushLog('"' + text + '" → no se reconoció ninguna actividad. Puedes tocar la fila manualmente.');
+  }
+}
+
+document.getElementById('sendBtn').addEventListener('click', ()=>{
+  const inp = document.getElementById('msgInput');
+  handleMessage(inp.value);
+  inp.value = '';
+  inp.focus();
+});
+document.getElementById('msgInput').addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter'){
+    document.getElementById('sendBtn').click();
+  }
+});
+
+// Reconocimiento de voz: mejora progresiva, con respaldo en el dictado del teclado
+const micBtn = document.getElementById('micBtn');
+let recognition = null;
+try{
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(SR){
+    recognition = new SR();
+    recognition.lang = 'es-MX';
+    recognition.interimResults = false;
+    recognition.onresult = (e)=>{
+      const transcript = e.results[0][0].transcript;
+      document.getElementById('msgInput').value = transcript;
+      handleMessage(transcript);
+      document.getElementById('msgInput').value = '';
+    };
+    recognition.onend = ()=> micBtn.classList.remove('listening');
+    recognition.onerror = ()=>{ micBtn.classList.remove('listening'); document.getElementById('msgInput').focus(); };
+  }
+}catch(e){ recognition = null; }
+
+micBtn.addEventListener('click', ()=>{
+  if(recognition){
+    try{
+      micBtn.classList.add('listening');
+      recognition.start();
+    }catch(e){
+      micBtn.classList.remove('listening');
+      document.getElementById('msgInput').focus();
+    }
+  } else {
+    document.getElementById('msgInput').focus();
+  }
+});
+
+// Bitácora de 21 días
+function ringSVG(pct, color){
+  const r = 15, c = 2*Math.PI*r;
+  const off = c * (1 - pct);
+  return `<svg viewBox="0 0 34 34">
+    <circle cx="17" cy="17" r="${r}" fill="none" stroke="#28375E" stroke-width="3"/>
+    <circle cx="17" cy="17" r="${r}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round"
+      stroke-dasharray="${c}" stroke-dashoffset="${off}"/>
+  </svg>`;
+}
+
+async function renderRings(){
+  const el = document.getElementById('rings');
+  el.innerHTML = '';
+  const days = [];
+  for(let i=20;i>=0;i--) days.push(i);
+  for(const offset of days){
+    const key = keyFor(offset);
+    let pts = 0;
+    if(offset === 0){
+      pts = state.points;
+    } else {
+      try{
+        const raw = localStorage.getItem('log:'+key);
+        if(raw){ pts = JSON.parse(raw).points || 0; }
+      }catch(e){ pts = 0; }
+    }
+    const pct = Math.min(pts / MAX_TOTAL, 1);
+    const color = pct >= 0.7 ? '#E4C766' : (pct > 0 ? '#8E9AB8' : '#28375E');
+    const dayNum = new Date(); dayNum.setDate(dayNum.getDate()-offset);
+    const div = document.createElement('div');
+    div.className = 'ring-day';
+    div.innerHTML = ringSVG(pct, color) + `<span class="lbl">${dayNum.getDate()}</span>`;
+    div.title = key + ': ' + pts + ' pts';
+    el.appendChild(div);
+  }
+}
+
+async function init(){
+  state = await loadDay(dayKey);
+  recalcPoints();
+  renderHeader();
+  renderHabits();
+  renderLog();
+  await renderRings();
+}
+init();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
