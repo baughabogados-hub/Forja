@@ -30,7 +30,7 @@
 body{margin:0; background:var(--navy); color:var(--text); font-family:'Inter',sans-serif; min-height:100vh;}
 .wrap{max-width:480px; margin:0 auto; padding:20px 16px 40px; min-height:100vh; display:flex; flex-direction:column;}
 
-header{border-bottom:1px solid var(--navy-3); padding-bottom:16px; margin-bottom:18px;}
+header{border-bottom:1px solid var(--navy-3); padding-bottom:16px; margin-bottom:14px;}
 .eyebrow{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; color:var(--gold); text-transform:uppercase;}
 h1{font-family:'Fraunces',serif; font-weight:700; font-size:34px; margin:4px 0 2px; color:var(--parchment); letter-spacing:-.01em;}
 .expediente-no{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--muted);}
@@ -38,6 +38,14 @@ h1{font-family:'Fraunces',serif; font-weight:700; font-size:34px; margin:4px 0 2
 .totalbar{display:flex; align-items:baseline; justify-content:space-between; margin-top:14px;}
 .totalbar .label{font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em;}
 .totalbar .points{font-family:'JetBrains Mono',monospace; font-size:22px; font-weight:600; color:var(--gold-light);}
+
+.tabnav{display:flex; gap:8px; margin-bottom:18px;}
+.tab-btn{flex:1; background:var(--navy-2); border:1px solid var(--navy-3); color:var(--muted); font-family:'Inter',sans-serif; font-weight:600; font-size:13.5px; padding:10px; border-radius:8px; cursor:pointer;}
+.tab-btn.active{background:var(--gold); color:var(--navy); border-color:var(--gold);}
+
+.subtabnav{display:flex; gap:6px; margin-bottom:14px;}
+.subtab-btn{flex:1; background:var(--navy-2); border:1px solid var(--navy-3); color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:11.5px; padding:8px 4px; border-radius:7px; cursor:pointer;}
+.subtab-btn.active{background:var(--navy-3); color:var(--gold-light); border-color:var(--gold);}
 
 .chatbox{background:var(--navy-2); border:1px solid var(--navy-3); border-radius:10px; padding:10px; margin-bottom:18px;}
 .chatrow{display:flex; gap:8px;}
@@ -70,6 +78,13 @@ h1{font-family:'Fraunces',serif; font-weight:700; font-size:34px; margin:4px 0 2
 .habit-sub{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--muted); margin-top:1px;}
 .habit-pts{font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--gold); font-weight:600; flex-shrink:0;}
 
+.periodic-row{display:flex; align-items:center; gap:12px; background:var(--navy-2); border:1px solid var(--navy-3); border-radius:9px; padding:12px 12px; margin-bottom:8px;}
+.periodic-row.active{border-color:var(--gold);}
+.periodic-count{width:38px; height:38px; flex-shrink:0; border-radius:50%; border:2px solid var(--navy-3); display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-weight:700; font-size:14px; color:var(--gold-light);}
+.periodic-btns{display:flex; gap:6px; flex-shrink:0;}
+.periodic-btns button{width:30px; height:30px; border-radius:6px; border:1px solid var(--navy-3); background:var(--navy); color:var(--parchment); font-size:16px; cursor:pointer; line-height:1;}
+.periodic-btns button.plus{background:var(--gold); color:var(--navy); border-color:var(--gold); font-weight:700;}
+
 .sleep-row{background:var(--navy-2); border:1px solid var(--navy-3); border-radius:9px; padding:12px; margin-bottom:24px; display:flex; align-items:center; gap:12px;}
 .sleep-row .habit-info{flex:1;}
 .sleep-val{font-family:'JetBrains Mono',monospace; font-size:20px; color:var(--gold-light); font-weight:600;}
@@ -90,7 +105,6 @@ h1{font-family:'Fraunces',serif; font-weight:700; font-size:34px; margin:4px 0 2
 .owner-line{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); margin-top:2px; cursor:pointer;}
 .owner-line span{border-bottom:1px dotted var(--muted);}
 
-
 .section-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;}
 .section-head .section-title{margin-bottom:0;}
 .edit-link{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); background:none; border:none; cursor:pointer; text-decoration:underline dotted;}
@@ -101,18 +115,27 @@ h1{font-family:'Fraunces',serif; font-weight:700; font-size:34px; margin:4px 0 2
 .manage-list{display:flex; flex-direction:column; gap:6px; margin-bottom:18px;}
 .manage-row{display:flex; align-items:center; gap:10px; background:var(--navy); border:1px solid var(--navy-3); border-radius:8px; padding:9px 10px;}
 .manage-row .m-name{flex:1; font-size:13.5px;}
+.manage-row .m-freq{font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--muted); background:var(--navy-2); border-radius:4px; padding:2px 6px; text-transform:uppercase;}
 .manage-row .m-pts{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--gold);}
 .manage-row .m-del{background:none; border:none; color:var(--stamp-light); font-size:16px; cursor:pointer; padding:2px 6px;}
 .manage-form{border-top:1px solid var(--navy-3); padding-top:14px;}
 .manage-form label{display:block; font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin:10px 0 4px;}
-.manage-form input{width:100%; background:var(--navy); border:1px solid var(--navy-3); border-radius:7px; color:var(--text); font-family:'Inter',sans-serif; font-size:14px; padding:9px 10px; outline:none;}
-.manage-form input:focus{border-color:var(--gold);}
+.manage-form input, .manage-form select{width:100%; background:var(--navy); border:1px solid var(--navy-3); border-radius:7px; color:var(--text); font-family:'Inter',sans-serif; font-size:14px; padding:9px 10px; outline:none;}
+.manage-form input:focus, .manage-form select:focus{border-color:var(--gold);}
 .manage-form .row2{display:flex; gap:10px;}
 .manage-form .row2 > div{flex:1;}
 .manage-actions{display:flex; gap:10px; margin-top:16px;}
 .manage-actions button{flex:1; border:none; border-radius:8px; font-weight:600; font-size:14px; padding:11px; cursor:pointer;}
 #habitAddBtn{background:var(--gold); color:var(--navy);}
 #manageCloseBtn{background:var(--navy); border:1px solid var(--navy-3) !important; color:var(--parchment);}
+
+.stat-row{background:var(--navy-2); border:1px solid var(--navy-3); border-radius:9px; padding:12px; margin-bottom:8px;}
+.stat-row .s-label{font-size:13.5px; font-weight:500;}
+.stat-row .s-sub{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--muted); margin-top:2px;}
+.stat-row .s-pts{font-family:'JetBrains Mono',monospace; font-size:16px; color:var(--gold-light); font-weight:600;}
+.stat-bar-bg{height:4px; background:var(--navy-3); border-radius:2px; margin-top:8px; overflow:hidden;}
+.stat-bar-fill{height:100%; background:var(--gold);}
+.stat-empty{font-size:12.5px; color:var(--muted); text-align:center; padding:30px 0;}
 
 footer{margin-top:24px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--navy-3);}
 </style>
@@ -140,59 +163,94 @@ footer{margin-top:24px; text-align:center; font-family:'JetBrains Mono',monospac
     </div>
   </header>
 
-  <div class="chatbox">
-    <div class="chatrow">
-      <button id="micBtn" title="Dictar">🎙️</button>
-      <input id="msgInput" type="text" placeholder="Declara lo que hiciste…" autocomplete="off">
-      <button id="sendBtn">Asentar</button>
+  <div class="tabnav">
+    <button class="tab-btn active" id="tabTodayBtn">Hoy</button>
+    <button class="tab-btn" id="tabStatsBtn">Estadísticas</button>
+  </div>
+
+  <div id="viewToday">
+
+    <div class="chatbox">
+      <div class="chatrow">
+        <button id="micBtn" title="Dictar">🎙️</button>
+        <input id="msgInput" type="text" placeholder="Declara lo que hiciste…" autocomplete="off">
+        <button id="sendBtn">Asentar</button>
+      </div>
+      <div class="hint">Toca el 🎙️ del teclado de tu teléfono para dictar, o escribe. Ej: "ya hice ejercicio", "dormí 7 horas", "lavé ropa".</div>
     </div>
-    <div class="hint">Toca el 🎙️ del teclado de tu teléfono para dictar, o escribe. Ej: "ya hice ejercicio", "dormí 7 horas", "ya desayuné".</div>
-  </div>
 
-  <div class="log" id="log"></div>
+    <div class="log" id="log"></div>
 
-  <div class="section-head">
-    <div class="section-title">Actuaciones del día</div>
-    <button class="edit-link" id="manageOpenBtn">editar hábitos</button>
-  </div>
-  <div class="habits" id="habits"></div>
+    <div class="section-head">
+      <div class="section-title">Actuaciones del día</div>
+      <button class="edit-link" id="manageOpenBtn">editar hábitos</button>
+    </div>
+    <div class="habits" id="habits"></div>
 
-  <div class="manage-overlay" id="manageOverlay" style="display:none;">
-    <div class="manage-card">
-      <h2>Tus hábitos</h2>
-      <div class="manage-list" id="manageList"></div>
-      <div class="manage-form">
-        <label>Nombre del hábito</label>
-        <input id="habitNameInput" type="text" placeholder="Ej. Estiramiento">
-        <div class="row2">
-          <div>
-            <label>Puntos</label>
-            <input id="habitPointsInput" type="number" min="1" max="50" placeholder="10">
+    <div id="weeklyBlock" style="display:none;">
+      <div class="section-title">Esta semana</div>
+      <div id="weeklyHabits"></div>
+    </div>
+
+    <div id="monthlyBlock" style="display:none;">
+      <div class="section-title">Este mes</div>
+      <div id="monthlyHabits"></div>
+    </div>
+
+    <div class="manage-overlay" id="manageOverlay" style="display:none;">
+      <div class="manage-card">
+        <h2>Tus hábitos</h2>
+        <div class="manage-list" id="manageList"></div>
+        <div class="manage-form">
+          <label>Nombre del hábito</label>
+          <input id="habitNameInput" type="text" placeholder="Ej. Estiramiento">
+          <div class="row2">
+            <div>
+              <label>Puntos</label>
+              <input id="habitPointsInput" type="number" min="1" max="50" placeholder="10">
+            </div>
+            <div>
+              <label>Frecuencia</label>
+              <select id="habitFreqInput">
+                <option value="daily">Diario</option>
+                <option value="weekly">Semanal</option>
+                <option value="monthly">Mensual</option>
+              </select>
+            </div>
           </div>
-          <div>
-            <label>Palabras clave (opcional)</label>
-            <input id="habitKeywordsInput" type="text" placeholder="separadas, por, coma">
+          <label>Palabras clave (opcional)</label>
+          <input id="habitKeywordsInput" type="text" placeholder="separadas, por, coma">
+          <div class="manage-actions">
+            <button id="manageCloseBtn">Cerrar</button>
+            <button id="habitAddBtn">Agregar hábito</button>
           </div>
-        </div>
-        <div class="manage-actions">
-          <button id="manageCloseBtn">Cerrar</button>
-          <button id="habitAddBtn">Agregar hábito</button>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="sleep-row">
-    <div class="habit-info">
-      <div class="habit-name">Sueño</div>
-      <div class="habit-sub" id="sleepSub">sin registrar</div>
+    <div class="sleep-row">
+      <div class="habit-info">
+        <div class="habit-name">Sueño</div>
+        <div class="habit-sub" id="sleepSub">sin registrar</div>
+      </div>
+      <div class="sleep-val" id="sleepVal">—</div>
     </div>
-    <div class="sleep-val" id="sleepVal">—</div>
+
+    <div class="bitacora">
+      <div class="section-title">Bitácora — últimos 21 días</div>
+      <div class="rings" id="rings"></div>
+    </div>
+
   </div>
 
-  <div class="bitacora">
-    <div class="section-title">Bitácora — últimos 21 días</div>
-    <div class="rings" id="rings"></div>
+  <div id="viewStats" style="display:none;">
+    <div class="subtabnav">
+      <button class="subtab-btn active" data-period="day">Día</button>
+      <button class="subtab-btn" data-period="week">Semana</button>
+      <button class="subtab-btn" data-period="month">Mes</button>
+      <button class="subtab-btn" data-period="year">Año</button>
+    </div>
+    <div id="statsList"></div>
   </div>
 
   <footer>BAUGH · FORJA · REGISTRO PRIVADO</footer>
@@ -200,23 +258,26 @@ footer{margin-top:24px; text-align:center; font-family:'JetBrains Mono',monospac
 
 <script>
 const DEFAULT_HABITS = [
-  {id:'ejercicio', label:'Ejercicio', points:20, kw:['ejercicio','entrene','entrené','gym','pesas','cardio','rutina de','press banca','entrenar']},
-  {id:'sinergeticos', label:'Clase Sinergéticos', points:15, kw:['sinergeticos','sinergética','sinergetico','clase']},
-  {id:'lectura', label:'Lectura', points:10, kw:['lei','leí','lectura','libro']},
-  {id:'meditacion', label:'Meditación', points:10, kw:['medite','medité','meditacion','meditación','medité']},
-  {id:'idiomas', label:'Idiomas', points:10, kw:['idioma','ingles','inglés','aleman','alemán','frances','francés']},
-  {id:'desayuno', label:'Desayuno', points:5, kw:['desayune','desayuné','desayuno','desayunar']},
-  {id:'comida', label:'Comida', points:5, kw:['comi','comí','comida','almorce','almorcé','almuerzo']},
-  {id:'arreglo', label:'Arreglo personal', points:5, kw:['arregle','arreglé','bane','bañé','arreglo personal','me arregle','me arreglé']},
+  {id:'ejercicio', label:'Ejercicio', points:20, freq:'daily', kw:['ejercicio','entrene','entrené','gym','pesas','cardio','rutina de','press banca','entrenar']},
+  {id:'sinergeticos', label:'Clase Sinergéticos', points:15, freq:'daily', kw:['sinergeticos','sinergética','sinergetico','clase']},
+  {id:'lectura', label:'Lectura', points:10, freq:'daily', kw:['lei','leí','lectura','libro']},
+  {id:'meditacion', label:'Meditación', points:10, freq:'daily', kw:['medite','medité','meditacion','meditación']},
+  {id:'idiomas', label:'Idiomas', points:10, freq:'daily', kw:['idioma','ingles','inglés','aleman','alemán','frances','francés']},
+  {id:'desayuno', label:'Desayuno', points:5, freq:'daily', kw:['desayune','desayuné','desayuno','desayunar']},
+  {id:'comida', label:'Comida', points:5, freq:'daily', kw:['comi','comí','comida','almorce','almorcé','almuerzo']},
+  {id:'arreglo', label:'Arreglo personal', points:5, freq:'daily', kw:['arregle','arreglé','bane','bañé','arreglo personal','me arregle','me arreglé']},
+  {id:'lavar-ropa', label:'Lavar ropa', points:10, freq:'weekly', kw:['lave ropa','lavé ropa','lavadora','lavar ropa']},
+  {id:'limpiar-casa', label:'Limpiar casa', points:15, freq:'weekly', kw:['limpie casa','limpié casa','limpieza','limpiar casa','limpie la casa']},
 ];
 const SLEEP_MAX = 10;
 let HABITS = [];
-function maxTotal(){ return HABITS.reduce((s,h)=>s+h.points,0) + SLEEP_MAX; }
+function maxTotal(){ return HABITS.filter(h=>h.freq==='daily').reduce((s,h)=>s+h.points,0) + SLEEP_MAX; }
 
 async function loadHabits(){
   try{
     const raw = localStorage.getItem('forja:habits');
-    return raw ? JSON.parse(raw) : DEFAULT_HABITS.map(h=>({...h}));
+    const parsed = raw ? JSON.parse(raw) : DEFAULT_HABITS.map(h=>({...h}));
+    return parsed.map(h => ({freq:'daily', ...h}));
   }catch(e){
     return DEFAULT_HABITS.map(h=>({...h}));
   }
@@ -241,6 +302,13 @@ function todayKey(d=new Date()){
 }
 function keyFor(offset){
   const d=new Date(); d.setDate(d.getDate()-offset); return todayKey(d);
+}
+function daysSinceMonday(){
+  const dow = new Date().getDay(); // 0=domingo..6=sabado
+  return dow === 0 ? 6 : dow - 1;
+}
+function daysSinceMonthStart(){
+  return new Date().getDate() - 1;
 }
 
 let state = {habitsDone:{}, sleepHours:null, points:0, messages:[]};
@@ -285,17 +353,49 @@ async function loadDay(key){
     return {habitsDone:{}, sleepHours:null, points:0, messages:[]};
   }
 }
+async function loadIndex(){
+  try{
+    const raw = localStorage.getItem('forja:index');
+    return raw ? JSON.parse(raw) : {};
+  }catch(e){ return {}; }
+}
+async function saveIndex(idx){
+  try{ localStorage.setItem('forja:index', JSON.stringify(idx)); }catch(e){}
+}
+async function updateIndex(key, points){
+  const idx = await loadIndex();
+  idx[key] = points;
+  await saveIndex(idx);
+}
+async function rebuildIndexIfNeeded(){
+  const idx = await loadIndex();
+  if(Object.keys(idx).length > 0) return;
+  const rebuilt = {};
+  try{
+    for(let i=0;i<localStorage.length;i++){
+      const k = localStorage.key(i);
+      if(k && k.indexOf('log:') === 0){
+        try{
+          const d = JSON.parse(localStorage.getItem(k));
+          rebuilt[k.slice(4)] = d.points || 0;
+        }catch(e){}
+      }
+    }
+  }catch(e){}
+  if(Object.keys(rebuilt).length > 0) await saveIndex(rebuilt);
+}
 async function saveDay(key, data){
   try{
     localStorage.setItem('log:'+key, JSON.stringify(data));
   }catch(e){
     console.error('No se pudo guardar', e);
   }
+  await updateIndex(key, data.points);
 }
 
 function recalcPoints(){
   let p = 0;
-  HABITS.forEach(h=>{ if(state.habitsDone[h.id]) p += h.points; });
+  HABITS.forEach(h=>{ const c = state.habitsDone[h.id]||0; p += c * h.points; });
   if(state.sleepHours !== null){
     p += 5;
     if(state.sleepHours >= 7) p += 5;
@@ -311,7 +411,7 @@ function renderHeader(){
 function renderHabits(){
   const el = document.getElementById('habits');
   el.innerHTML = '';
-  HABITS.forEach(h=>{
+  HABITS.filter(h=>h.freq==='daily').forEach(h=>{
     const done = !!state.habitsDone[h.id];
     const row = document.createElement('div');
     row.className = 'habit' + (done ? ' done' : '');
@@ -338,6 +438,64 @@ function renderHabits(){
   }
 }
 
+async function renderPeriodicHabits(){
+  const weeklyHabits = HABITS.filter(h=>h.freq==='weekly');
+  const monthlyHabits = HABITS.filter(h=>h.freq==='monthly');
+  document.getElementById('weeklyBlock').style.display = weeklyHabits.length ? '' : 'none';
+  document.getElementById('monthlyBlock').style.display = monthlyHabits.length ? '' : 'none';
+
+  if(weeklyHabits.length){
+    const sums = await sumHabitsOverDays(daysSinceMonday()+1, weeklyHabits.map(h=>h.id));
+    document.getElementById('weeklyHabits').innerHTML = weeklyHabits.map(h => periodicRowHTML(h, sums[h.id]||0)).join('');
+    attachPeriodicHandlers('weeklyHabits');
+  }
+  if(monthlyHabits.length){
+    const sums = await sumHabitsOverDays(daysSinceMonthStart()+1, monthlyHabits.map(h=>h.id));
+    document.getElementById('monthlyHabits').innerHTML = monthlyHabits.map(h => periodicRowHTML(h, sums[h.id]||0)).join('');
+    attachPeriodicHandlers('monthlyHabits');
+  }
+}
+
+function periodicRowHTML(h, count){
+  return `
+    <div class="periodic-row ${count>0?'active':''}" data-id="${h.id}">
+      <div class="periodic-count">${count}</div>
+      <div class="habit-info">
+        <div class="habit-name">${h.label}</div>
+        <div class="habit-sub">+${h.points} c/u</div>
+      </div>
+      <div class="periodic-btns">
+        <button class="minus" data-act="minus" data-id="${h.id}">−</button>
+        <button class="plus" data-act="plus" data-id="${h.id}">+</button>
+      </div>
+    </div>
+  `;
+}
+function attachPeriodicHandlers(containerId){
+  document.getElementById(containerId).querySelectorAll('button[data-act]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = btn.getAttribute('data-id');
+      const act = btn.getAttribute('data-act');
+      if(act === 'plus') incrementHabit(id);
+      else decrementHabit(id);
+    });
+  });
+}
+
+async function sumHabitsOverDays(numDays, ids){
+  const sums = {}; ids.forEach(id=>sums[id]=0);
+  for(let offset=0; offset<numDays; offset++){
+    let d;
+    if(offset === 0){
+      d = state;
+    } else {
+      d = await loadDay(keyFor(offset));
+    }
+    ids.forEach(id=>{ sums[id] += (d.habitsDone && d.habitsDone[id]) || 0; });
+  }
+  return sums;
+}
+
 function renderLog(){
   const el = document.getElementById('log');
   el.innerHTML = state.messages.map((m,i)=>`
@@ -349,11 +507,28 @@ function renderLog(){
 async function toggleHabit(id, fromParse=false){
   const wasDone = !!state.habitsDone[id];
   if(fromParse && wasDone) return false; // ya sellado hoy, no duplicar
-  state.habitsDone[id] = !wasDone;
+  state.habitsDone[id] = wasDone ? 0 : 1;
   recalcPoints();
   renderHeader(); renderHabits();
   await saveDay(dayKey, state);
   return true;
+}
+
+async function incrementHabit(id, fromParse=false){
+  state.habitsDone[id] = (state.habitsDone[id]||0) + 1;
+  recalcPoints();
+  renderHeader();
+  await saveDay(dayKey, state);
+  await renderPeriodicHabits();
+  return true;
+}
+async function decrementHabit(id){
+  if(!state.habitsDone[id]) return;
+  state.habitsDone[id] = Math.max(0, state.habitsDone[id]-1);
+  recalcPoints();
+  renderHeader();
+  await saveDay(dayKey, state);
+  await renderPeriodicHabits();
 }
 
 async function setSleep(hours){
@@ -378,8 +553,13 @@ async function handleMessage(raw){
 
   for(const h of HABITS){
     if(h.kw.some(k=>n.includes(norm(k)))){
-      const changed = await toggleHabit(h.id, true);
-      if(changed) matched.push(h.label);
+      if(h.freq === 'daily'){
+        const changed = await toggleHabit(h.id, true);
+        if(changed) matched.push(h.label);
+      } else {
+        await incrementHabit(h.id, true);
+        matched.push(h.label);
+      }
     }
   }
 
@@ -395,6 +575,7 @@ async function handleMessage(raw){
   if(matched.length){
     pushLog('"' + text + '" → sellado: ' + matched.join(', '));
     await saveDay(dayKey, state);
+    await renderRings();
   } else {
     pushLog('"' + text + '" → no se reconoció ninguna actividad. Puedes tocar la fila manualmente.');
   }
@@ -460,19 +641,12 @@ function ringSVG(pct, color){
 async function renderRings(){
   const el = document.getElementById('rings');
   el.innerHTML = '';
+  const idx = await loadIndex();
   const days = [];
   for(let i=20;i>=0;i--) days.push(i);
   for(const offset of days){
     const key = keyFor(offset);
-    let pts = 0;
-    if(offset === 0){
-      pts = state.points;
-    } else {
-      try{
-        const raw = localStorage.getItem('log:'+key);
-        if(raw){ pts = JSON.parse(raw).points || 0; }
-      }catch(e){ pts = 0; }
-    }
+    const pts = offset === 0 ? state.points : (idx[key] || 0);
     const pct = Math.min(pts / maxTotal(), 1);
     const color = pct >= 0.7 ? '#E4C766' : (pct > 0 ? '#8E9AB8' : '#28375E');
     const dayNum = new Date(); dayNum.setDate(dayNum.getDate()-offset);
@@ -484,16 +658,17 @@ async function renderRings(){
   }
 }
 
-
 function renderManageList(){
   const el = document.getElementById('manageList');
   if(HABITS.length === 0){
     el.innerHTML = '<div style="font-size:12.5px;color:var(--muted);">Aún no tienes hábitos. Agrega el primero abajo.</div>';
     return;
   }
+  const freqLabel = {daily:'diario', weekly:'semanal', monthly:'mensual'};
   el.innerHTML = HABITS.map(h => `
     <div class="manage-row" data-id="${h.id}">
       <div class="m-name">${h.label}</div>
+      <div class="m-freq">${freqLabel[h.freq]||'diario'}</div>
       <div class="m-pts">+${h.points}</div>
       <button class="m-del" data-del="${h.id}" title="Eliminar">✕</button>
     </div>
@@ -509,13 +684,14 @@ async function deleteHabit(id){
   recalcPoints();
   await saveHabits();
   await saveDay(dayKey, state);
-  renderHeader(); renderHabits(); renderManageList(); await renderRings();
+  renderHeader(); renderHabits(); renderManageList(); await renderPeriodicHabits(); await renderRings();
 }
 
 async function addHabitFromForm(){
   const nameInput = document.getElementById('habitNameInput');
   const ptsInput = document.getElementById('habitPointsInput');
   const kwInput = document.getElementById('habitKeywordsInput');
+  const freqInput = document.getElementById('habitFreqInput');
   const name = nameInput.value.trim();
   let pts = parseInt(ptsInput.value, 10);
   if(!name) return;
@@ -523,10 +699,11 @@ async function addHabitFromForm(){
   let kw = kwInput.value.split(',').map(s=>s.trim()).filter(Boolean);
   if(kw.length === 0) kw = [name];
   const id = slugify(name);
-  HABITS.push({id, label:name, points:pts, kw});
+  const freq = freqInput.value || 'daily';
+  HABITS.push({id, label:name, points:pts, freq, kw});
   await saveHabits();
-  renderHeader(); renderHabits(); renderManageList(); await renderRings();
-  nameInput.value=''; ptsInput.value=''; kwInput.value='';
+  renderHeader(); renderHabits(); renderManageList(); await renderPeriodicHabits(); await renderRings();
+  nameInput.value=''; ptsInput.value=''; kwInput.value=''; freqInput.value='daily';
   nameInput.focus();
 }
 
@@ -539,14 +716,146 @@ document.getElementById('manageCloseBtn').addEventListener('click', ()=>{
 });
 document.getElementById('habitAddBtn').addEventListener('click', addHabitFromForm);
 
+// Tabs Hoy / Estadísticas
+document.getElementById('tabTodayBtn').addEventListener('click', ()=>{
+  document.getElementById('tabTodayBtn').classList.add('active');
+  document.getElementById('tabStatsBtn').classList.remove('active');
+  document.getElementById('viewToday').style.display = '';
+  document.getElementById('viewStats').style.display = 'none';
+});
+document.getElementById('tabStatsBtn').addEventListener('click', ()=>{
+  document.getElementById('tabStatsBtn').classList.add('active');
+  document.getElementById('tabTodayBtn').classList.remove('active');
+  document.getElementById('viewStats').style.display = '';
+  document.getElementById('viewToday').style.display = 'none';
+  renderStats(currentPeriod);
+});
+
+let currentPeriod = 'day';
+document.querySelectorAll('.subtab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.subtab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentPeriod = btn.getAttribute('data-period');
+    renderStats(currentPeriod);
+  });
+});
+
+const MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+function dateFromKey(key){
+  const [y,m,d] = key.split('-').map(Number);
+  return new Date(y, m-1, d);
+}
+function mondayOf(date){
+  const d = new Date(date);
+  const dow = d.getDay();
+  const diff = dow === 0 ? 6 : dow - 1;
+  d.setDate(d.getDate() - diff);
+  return d;
+}
+
+async function renderStats(period){
+  const el = document.getElementById('statsList');
+  const idx = await loadIndex();
+  const entries = Object.keys(idx).map(k=>({key:k, pts:idx[k]})).sort((a,b)=> a.key < b.key ? 1 : -1);
+
+  if(entries.length === 0){
+    el.innerHTML = '<div class="stat-empty">Aún no hay suficientes días registrados para mostrar estadísticas.</div>';
+    return;
+  }
+
+  if(period === 'day'){
+    const rows = entries.slice(0, 21).map(e=>{
+      const d = dateFromKey(e.key);
+      const label = d.getDate() + ' ' + MESES[d.getMonth()];
+      const pct = Math.min(100, Math.round((e.pts / maxTotal()) * 100));
+      return statRowHTML(label, e.pts + ' pts', pct);
+    });
+    el.innerHTML = rows.join('');
+    return;
+  }
+
+  if(period === 'week'){
+    const groups = {};
+    entries.forEach(e=>{
+      const wk = todayKey(mondayOf(dateFromKey(e.key)));
+      groups[wk] = groups[wk] || {pts:0, days:0};
+      groups[wk].pts += e.pts;
+      groups[wk].days += (e.pts>0?1:0);
+    });
+    const weekKeys = Object.keys(groups).sort().reverse().slice(0,10);
+    el.innerHTML = weekKeys.map(wk=>{
+      const d = dateFromKey(wk);
+      const end = new Date(d); end.setDate(end.getDate()+6);
+      const label = d.getDate()+' '+MESES[d.getMonth()]+' – '+end.getDate()+' '+MESES[end.getMonth()];
+      const g = groups[wk];
+      const pct = Math.min(100, Math.round((g.pts / (maxTotal()*7)) * 100));
+      return statRowHTML(label, g.pts + ' pts', pct, g.days + '/7 días activos');
+    }).join('');
+    return;
+  }
+
+  if(period === 'month'){
+    const groups = {};
+    entries.forEach(e=>{
+      const mk = e.key.slice(0,7);
+      groups[mk] = groups[mk] || {pts:0, days:0};
+      groups[mk].pts += e.pts;
+      groups[mk].days += (e.pts>0?1:0);
+    });
+    const monthKeys = Object.keys(groups).sort().reverse().slice(0,12);
+    el.innerHTML = monthKeys.map(mk=>{
+      const [y,m] = mk.split('-').map(Number);
+      const label = MESES[m-1] + ' ' + y;
+      const g = groups[mk];
+      return statRowHTML(label, g.pts + ' pts', null, g.days + ' días activos');
+    }).join('');
+    return;
+  }
+
+  if(period === 'year'){
+    const groups = {};
+    entries.forEach(e=>{
+      const yk = e.key.slice(0,4);
+      groups[yk] = groups[yk] || {pts:0, days:0};
+      groups[yk].pts += e.pts;
+      groups[yk].days += (e.pts>0?1:0);
+    });
+    const yearKeys = Object.keys(groups).sort().reverse();
+    el.innerHTML = yearKeys.map(yk=>{
+      const g = groups[yk];
+      return statRowHTML(yk, g.pts + ' pts', null, g.days + ' días activos');
+    }).join('');
+    return;
+  }
+}
+
+function statRowHTML(label, ptsLabel, pct, sub){
+  return `
+    <div class="stat-row">
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div>
+          <div class="s-label">${label}</div>
+          ${sub ? `<div class="s-sub">${sub}</div>` : ''}
+        </div>
+        <div class="s-pts">${ptsLabel}</div>
+      </div>
+      ${pct !== null && pct !== undefined ? `<div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${pct}%;"></div></div>` : ''}
+    </div>
+  `;
+}
+
 async function init(){
   ensureName();
   HABITS = await loadHabits();
   state = await loadDay(dayKey);
   recalcPoints();
+  await rebuildIndexIfNeeded();
+  await updateIndex(dayKey, state.points);
   renderHeader();
   renderHabits();
   renderLog();
+  await renderPeriodicHabits();
   await renderRings();
 }
 init();
