@@ -80,16 +80,60 @@ h1{font-family:'Fraunces',serif; font-weight:700; font-size:34px; margin:4px 0 2
 .ring-day svg{width:100%; height:100%; transform:rotate(-90deg);}
 .ring-day .lbl{position:absolute; font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--muted);}
 
+.name-overlay{position:fixed; inset:0; background:rgba(10,14,26,.92); display:flex; align-items:center; justify-content:center; z-index:50; padding:24px;}
+.name-card{background:var(--navy-2); border:1px solid var(--gold); border-radius:12px; padding:24px; max-width:340px; width:100%; text-align:center;}
+.name-card .eyebrow{display:block; margin-bottom:6px;}
+.name-card h2{font-family:'Fraunces',serif; color:var(--parchment); font-size:24px; margin:4px 0 14px;}
+.name-card input{width:100%; background:var(--navy); border:1px solid var(--navy-3); border-radius:8px; color:var(--text); font-family:'Inter',sans-serif; font-size:16px; padding:11px 12px; outline:none; text-align:center; margin-bottom:14px;}
+.name-card input:focus{border-color:var(--gold);}
+.name-card button{width:100%; background:var(--gold); color:var(--navy); border:none; border-radius:8px; font-weight:600; font-size:15px; padding:12px; cursor:pointer;}
+.owner-line{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); margin-top:2px; cursor:pointer;}
+.owner-line span{border-bottom:1px dotted var(--muted);}
+
+
+.section-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;}
+.section-head .section-title{margin-bottom:0;}
+.edit-link{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); background:none; border:none; cursor:pointer; text-decoration:underline dotted;}
+
+.manage-overlay{position:fixed; inset:0; background:rgba(10,14,26,.92); display:flex; align-items:center; justify-content:center; z-index:50; padding:20px;}
+.manage-card{background:var(--navy-2); border:1px solid var(--gold); border-radius:12px; padding:22px; max-width:400px; width:100%; max-height:85vh; overflow-y:auto;}
+.manage-card h2{font-family:'Fraunces',serif; color:var(--parchment); font-size:20px; margin:0 0 14px;}
+.manage-list{display:flex; flex-direction:column; gap:6px; margin-bottom:18px;}
+.manage-row{display:flex; align-items:center; gap:10px; background:var(--navy); border:1px solid var(--navy-3); border-radius:8px; padding:9px 10px;}
+.manage-row .m-name{flex:1; font-size:13.5px;}
+.manage-row .m-pts{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--gold);}
+.manage-row .m-del{background:none; border:none; color:var(--stamp-light); font-size:16px; cursor:pointer; padding:2px 6px;}
+.manage-form{border-top:1px solid var(--navy-3); padding-top:14px;}
+.manage-form label{display:block; font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin:10px 0 4px;}
+.manage-form input{width:100%; background:var(--navy); border:1px solid var(--navy-3); border-radius:7px; color:var(--text); font-family:'Inter',sans-serif; font-size:14px; padding:9px 10px; outline:none;}
+.manage-form input:focus{border-color:var(--gold);}
+.manage-form .row2{display:flex; gap:10px;}
+.manage-form .row2 > div{flex:1;}
+.manage-actions{display:flex; gap:10px; margin-top:16px;}
+.manage-actions button{flex:1; border:none; border-radius:8px; font-weight:600; font-size:14px; padding:11px; cursor:pointer;}
+#habitAddBtn{background:var(--gold); color:var(--navy);}
+#manageCloseBtn{background:var(--navy); border:1px solid var(--navy-3) !important; color:var(--parchment);}
+
 footer{margin-top:24px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--navy-3);}
 </style>
 </head>
 <body>
 <div class="wrap">
 
+  <div class="name-overlay" id="nameOverlay" style="display:none;">
+    <div class="name-card">
+      <span class="eyebrow">Bienvenido</span>
+      <h2>¿Cómo te llamas?</h2>
+      <input id="nameInput" type="text" placeholder="Tu nombre" autocomplete="off">
+      <button id="nameSaveBtn">Guardar</button>
+    </div>
+  </div>
+
   <header>
     <div class="eyebrow">Bitácora Personal</div>
     <h1>Forja</h1>
-    <div class="expediente-no" id="expNo">Exp. —</div>
+    <div class="owner-line" id="ownerLine">de <span id="ownerName">—</span></div>
+    <div class="expediente-no" id="expNo">Forja No. —</div>
     <div class="totalbar">
       <div><div class="label">Puntos de hoy</div></div>
       <div class="points" id="todayPoints">0 / 90</div>
@@ -107,8 +151,36 @@ footer{margin-top:24px; text-align:center; font-family:'JetBrains Mono',monospac
 
   <div class="log" id="log"></div>
 
-  <div class="section-title">Actuaciones del día</div>
+  <div class="section-head">
+    <div class="section-title">Actuaciones del día</div>
+    <button class="edit-link" id="manageOpenBtn">editar hábitos</button>
+  </div>
   <div class="habits" id="habits"></div>
+
+  <div class="manage-overlay" id="manageOverlay" style="display:none;">
+    <div class="manage-card">
+      <h2>Tus hábitos</h2>
+      <div class="manage-list" id="manageList"></div>
+      <div class="manage-form">
+        <label>Nombre del hábito</label>
+        <input id="habitNameInput" type="text" placeholder="Ej. Estiramiento">
+        <div class="row2">
+          <div>
+            <label>Puntos</label>
+            <input id="habitPointsInput" type="number" min="1" max="50" placeholder="10">
+          </div>
+          <div>
+            <label>Palabras clave (opcional)</label>
+            <input id="habitKeywordsInput" type="text" placeholder="separadas, por, coma">
+          </div>
+        </div>
+        <div class="manage-actions">
+          <button id="manageCloseBtn">Cerrar</button>
+          <button id="habitAddBtn">Agregar hábito</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div class="sleep-row">
     <div class="habit-info">
@@ -127,7 +199,7 @@ footer{margin-top:24px; text-align:center; font-family:'JetBrains Mono',monospac
 </div>
 
 <script>
-const HABITS = [
+const DEFAULT_HABITS = [
   {id:'ejercicio', label:'Ejercicio', points:20, kw:['ejercicio','entrene','entrené','gym','pesas','cardio','rutina de','press banca','entrenar']},
   {id:'sinergeticos', label:'Clase Sinergéticos', points:15, kw:['sinergeticos','sinergética','sinergetico','clase']},
   {id:'lectura', label:'Lectura', points:10, kw:['lei','leí','lectura','libro']},
@@ -138,7 +210,27 @@ const HABITS = [
   {id:'arreglo', label:'Arreglo personal', points:5, kw:['arregle','arreglé','bane','bañé','arreglo personal','me arregle','me arreglé']},
 ];
 const SLEEP_MAX = 10;
-const MAX_TOTAL = HABITS.reduce((s,h)=>s+h.points,0) + SLEEP_MAX;
+let HABITS = [];
+function maxTotal(){ return HABITS.reduce((s,h)=>s+h.points,0) + SLEEP_MAX; }
+
+async function loadHabits(){
+  try{
+    const raw = localStorage.getItem('forja:habits');
+    return raw ? JSON.parse(raw) : DEFAULT_HABITS.map(h=>({...h}));
+  }catch(e){
+    return DEFAULT_HABITS.map(h=>({...h}));
+  }
+}
+async function saveHabits(){
+  try{ localStorage.setItem('forja:habits', JSON.stringify(HABITS)); }catch(e){}
+}
+function slugify(name){
+  let base = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+  if(!base) base = 'habito';
+  let id = base, n = 1;
+  while(HABITS.some(h=>h.id===id)){ id = base + '-' + (++n); }
+  return id;
+}
 
 function norm(s){
   return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
@@ -152,6 +244,37 @@ function keyFor(offset){
 }
 
 let state = {habitsDone:{}, sleepHours:null, points:0, messages:[]};
+
+function getName(){
+  try{ return localStorage.getItem('forja:name'); }catch(e){ return null; }
+}
+function setName(name){
+  try{ localStorage.setItem('forja:name', name); }catch(e){}
+  document.getElementById('ownerName').textContent = name;
+}
+function ensureName(){
+  const name = getName();
+  if(name){
+    document.getElementById('ownerName').textContent = name;
+  } else {
+    document.getElementById('nameOverlay').style.display = 'flex';
+    document.getElementById('nameInput').focus();
+  }
+}
+document.getElementById('nameSaveBtn').addEventListener('click', ()=>{
+  const val = document.getElementById('nameInput').value.trim();
+  if(!val) return;
+  setName(val);
+  document.getElementById('nameOverlay').style.display = 'none';
+});
+document.getElementById('nameInput').addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter') document.getElementById('nameSaveBtn').click();
+});
+document.getElementById('ownerLine').addEventListener('click', ()=>{
+  document.getElementById('nameInput').value = getName() || '';
+  document.getElementById('nameOverlay').style.display = 'flex';
+  document.getElementById('nameInput').focus();
+});
 const dayKey = todayKey();
 
 async function loadDay(key){
@@ -182,7 +305,7 @@ function recalcPoints(){
 
 function renderHeader(){
   document.getElementById('expNo').textContent = 'Forja No. ' + dayKey.replace(/-/g,'/');
-  document.getElementById('todayPoints').textContent = state.points + ' / ' + MAX_TOTAL;
+  document.getElementById('todayPoints').textContent = state.points + ' / ' + maxTotal();
 }
 
 function renderHabits(){
@@ -350,7 +473,7 @@ async function renderRings(){
         if(raw){ pts = JSON.parse(raw).points || 0; }
       }catch(e){ pts = 0; }
     }
-    const pct = Math.min(pts / MAX_TOTAL, 1);
+    const pct = Math.min(pts / maxTotal(), 1);
     const color = pct >= 0.7 ? '#E4C766' : (pct > 0 ? '#8E9AB8' : '#28375E');
     const dayNum = new Date(); dayNum.setDate(dayNum.getDate()-offset);
     const div = document.createElement('div');
@@ -361,7 +484,64 @@ async function renderRings(){
   }
 }
 
+
+function renderManageList(){
+  const el = document.getElementById('manageList');
+  if(HABITS.length === 0){
+    el.innerHTML = '<div style="font-size:12.5px;color:var(--muted);">Aún no tienes hábitos. Agrega el primero abajo.</div>';
+    return;
+  }
+  el.innerHTML = HABITS.map(h => `
+    <div class="manage-row" data-id="${h.id}">
+      <div class="m-name">${h.label}</div>
+      <div class="m-pts">+${h.points}</div>
+      <button class="m-del" data-del="${h.id}" title="Eliminar">✕</button>
+    </div>
+  `).join('');
+  el.querySelectorAll('[data-del]').forEach(btn=>{
+    btn.addEventListener('click', ()=> deleteHabit(btn.getAttribute('data-del')));
+  });
+}
+
+async function deleteHabit(id){
+  HABITS = HABITS.filter(h => h.id !== id);
+  delete state.habitsDone[id];
+  recalcPoints();
+  await saveHabits();
+  await saveDay(dayKey, state);
+  renderHeader(); renderHabits(); renderManageList(); await renderRings();
+}
+
+async function addHabitFromForm(){
+  const nameInput = document.getElementById('habitNameInput');
+  const ptsInput = document.getElementById('habitPointsInput');
+  const kwInput = document.getElementById('habitKeywordsInput');
+  const name = nameInput.value.trim();
+  let pts = parseInt(ptsInput.value, 10);
+  if(!name) return;
+  if(isNaN(pts) || pts <= 0) pts = 10;
+  let kw = kwInput.value.split(',').map(s=>s.trim()).filter(Boolean);
+  if(kw.length === 0) kw = [name];
+  const id = slugify(name);
+  HABITS.push({id, label:name, points:pts, kw});
+  await saveHabits();
+  renderHeader(); renderHabits(); renderManageList(); await renderRings();
+  nameInput.value=''; ptsInput.value=''; kwInput.value='';
+  nameInput.focus();
+}
+
+document.getElementById('manageOpenBtn').addEventListener('click', ()=>{
+  renderManageList();
+  document.getElementById('manageOverlay').style.display = 'flex';
+});
+document.getElementById('manageCloseBtn').addEventListener('click', ()=>{
+  document.getElementById('manageOverlay').style.display = 'none';
+});
+document.getElementById('habitAddBtn').addEventListener('click', addHabitFromForm);
+
 async function init(){
+  ensureName();
+  HABITS = await loadHabits();
   state = await loadDay(dayKey);
   recalcPoints();
   renderHeader();
