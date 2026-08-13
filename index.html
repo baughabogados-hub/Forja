@@ -185,6 +185,7 @@ footer{margin-top:24px; text-align:center; font-family:'JetBrains Mono',monospac
       <div class="section-title">Actuaciones del día</div>
       <button class="edit-link" id="manageOpenBtn">editar hábitos</button>
     </div>
+    <div id="graduacionBanner" style="margin-bottom:8px;"></div>
     <div class="habits" id="habits"></div>
 
     <div id="weeklyBlock" style="display:none;">
@@ -236,6 +237,31 @@ footer{margin-top:24px; text-align:center; font-family:'JetBrains Mono',monospac
       <div class="sleep-val" id="sleepVal">—</div>
     </div>
 
+    <div class="periodic-row" id="cabezaFriaBtn" style="cursor:pointer; margin-bottom:24px;">
+      <div class="periodic-count">🧊</div>
+      <div class="habit-info">
+        <div class="habit-name">Actué con cabeza fría</div>
+        <div class="habit-sub" id="cabezaFriaHoy">registro voluntario</div>
+      </div>
+    </div>
+
+    <div class="manage-overlay" id="cabezaFriaOverlay" style="display:none;">
+      <div class="manage-card" style="max-width:360px;">
+        <h2>Actué con cabeza fría</h2>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--parchment-dim); line-height:1.7; background:var(--navy); border:1px solid var(--navy-3); border-radius:8px; padding:12px; margin-bottom:14px;">
+          30 minutos → ¿Qué sé? → ¿Qué estoy suponiendo? → ¿Qué quiero conseguir? → Actúo.
+        </div>
+        <div class="manage-form" style="padding-top:0; border-top:none;">
+          <label>¿Qué ocurrió? (opcional)</label>
+          <input id="cabezaFriaNota" type="text" placeholder="En una frase...">
+        </div>
+        <div class="manage-actions">
+          <button id="cabezaFriaCloseBtn" style="background:var(--navy); border:1px solid var(--navy-3) !important; color:var(--parchment);">Cancelar</button>
+          <button id="cabezaFriaSaveBtn" style="background:var(--gold); color:var(--navy);">Registrar</button>
+        </div>
+      </div>
+    </div>
+
     <div class="bitacora">
       <div class="section-title">Bitácora — últimos 21 días</div>
       <div class="rings" id="rings"></div>
@@ -250,6 +276,7 @@ footer{margin-top:24px; text-align:center; font-family:'JetBrains Mono',monospac
       <button class="subtab-btn" data-period="month">Mes</button>
       <button class="subtab-btn" data-period="year">Año</button>
     </div>
+    <div id="nuevasMetricas"></div>
     <div id="statsList"></div>
   </div>
 
@@ -268,10 +295,27 @@ const DEFAULT_HABITS = [
   {id:'arreglo', label:'Arreglo personal', points:5, freq:'daily', kw:['arregle','arreglé','bane','bañé','arreglo personal','me arregle','me arreglé']},
   {id:'lavar-ropa', label:'Lavar ropa', points:10, freq:'weekly', kw:['lave ropa','lavé ropa','lavadora','lavar ropa']},
   {id:'limpiar-casa', label:'Limpiar casa', points:15, freq:'weekly', kw:['limpie casa','limpié casa','limpieza','limpiar casa','limpie la casa']},
+  {id:'primero-lo-incomodo', label:'Primero lo incómodo', points:15, freq:'daily', graduado:false, kw:['primero lo incomodo','tarea incomoda','venci la resistencia','vencí la resistencia','vencer la resistencia','hice lo que evitaba','deje de procrastinar','deje de posponer','procrastinaba y lo hice']},
+  {id:'soltar-control', label:'Soltar control', points:30, freq:'weekly', kw:['solte el control','solté el control','solte control','solté control','delegue','delegué']},
+  {id:'construir-patrimonio', label:'Construir patrimonio', points:100, freq:'monthly', kw:['construir patrimonio','ahorre','ahorré','aparte para ahorro','aparté para ahorro','inverti','invertí']},
 ];
+// Actuaciones agregadas después del lanzamiento inicial: si ya existe una
+// instalación con hábitos guardados en localStorage, se agregan una sola vez
+// sin tocar los hábitos ni el historial que el usuario ya tenía.
+const NUEVAS_ACTUACIONES = DEFAULT_HABITS.slice(-3).map(h=>({...h}));
 const SLEEP_MAX = 10;
 let HABITS = [];
-function maxTotal(){ return HABITS.filter(h=>h.freq==='daily').reduce((s,h)=>s+h.points,0) + SLEEP_MAX; }
+function maxTotal(){ return HABITS.filter(h=>h.freq==='daily' && !h.graduado).reduce((s,h)=>s+h.points,0) + SLEEP_MAX; }
+async function migrarNuevasActuaciones(){
+  let cambio = false;
+  NUEVAS_ACTUACIONES.forEach(n=>{
+    if(!HABITS.some(h=>h.id===n.id)){
+      HABITS.push({...n});
+      cambio = true;
+    }
+  });
+  if(cambio) await saveHabits();
+}
 
 async function loadHabits(){
   try{
@@ -411,7 +455,7 @@ function renderHeader(){
 function renderHabits(){
   const el = document.getElementById('habits');
   el.innerHTML = '';
-  HABITS.filter(h=>h.freq==='daily').forEach(h=>{
+  HABITS.filter(h=>h.freq==='daily' && !h.graduado).forEach(h=>{
     const done = !!state.habitsDone[h.id];
     const row = document.createElement('div');
     row.className = 'habit' + (done ? ' done' : '');
@@ -551,7 +595,7 @@ async function handleMessage(raw){
   const n = norm(text);
   let matched = [];
 
-  for(const h of HABITS){
+  for(const h of HABITS.filter(h=>!h.graduado)){
     if(h.kw.some(k=>n.includes(norm(k)))){
       if(h.freq === 'daily'){
         const changed = await toggleHabit(h.id, true);
@@ -665,7 +709,9 @@ function renderManageList(){
     return;
   }
   const freqLabel = {daily:'diario', weekly:'semanal', monthly:'mensual'};
-  el.innerHTML = HABITS.map(h => `
+  const activos = HABITS.filter(h=>!h.graduado);
+  const graduados = HABITS.filter(h=>h.graduado);
+  let html = activos.map(h => `
     <div class="manage-row" data-id="${h.id}">
       <div class="m-name">${h.label}</div>
       <div class="m-freq">${freqLabel[h.freq]||'diario'}</div>
@@ -673,9 +719,31 @@ function renderManageList(){
       <button class="m-del" data-del="${h.id}" title="Eliminar">✕</button>
     </div>
   `).join('');
+  if(graduados.length){
+    html += `<div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin:14px 0 6px;">Graduados</div>`;
+    html += graduados.map(h => `
+      <div class="manage-row" data-id="${h.id}">
+        <div class="m-name">${h.label}</div>
+        <div class="m-freq">${freqLabel[h.freq]||'diario'}</div>
+        <button class="m-del" data-reactivar="${h.id}" title="Reactivar" style="color:var(--gold-light); font-size:11px; width:auto;">↩ Reactivar</button>
+      </div>
+    `).join('');
+  }
+  el.innerHTML = html;
   el.querySelectorAll('[data-del]').forEach(btn=>{
     btn.addEventListener('click', ()=> deleteHabit(btn.getAttribute('data-del')));
   });
+  el.querySelectorAll('[data-reactivar]').forEach(btn=>{
+    btn.addEventListener('click', ()=> reactivarHabit(btn.getAttribute('data-reactivar')));
+  });
+}
+
+async function reactivarHabit(id){
+  const h = HABITS.find(x=>x.id===id);
+  if(!h) return;
+  h.graduado = false;
+  await saveHabits();
+  renderHeader(); renderHabits(); renderManageList(); await renderPeriodicHabits(); await renderRings();
 }
 
 async function deleteHabit(id){
@@ -686,6 +754,107 @@ async function deleteHabit(id){
   await saveDay(dayKey, state);
   renderHeader(); renderHabits(); renderManageList(); await renderPeriodicHabits(); await renderRings();
 }
+
+// ── Graduación de hábitos ────────────────────────────────────────────────
+// Si un hábito diario lleva 30 días con 90%+ de cumplimiento, se sugiere
+// graduarlo. Nunca se elimina solo: el usuario decide, y puede reactivarlo
+// cuando quiera. El historial estadístico de días anteriores no se toca.
+const GRADUACION_DIAS = 30;
+const GRADUACION_UMBRAL = 0.9;
+let graduacionCandidatos = [];
+
+async function checkGraduaciones(){
+  const idx = await loadIndex();
+  if(Object.keys(idx).length < GRADUACION_DIAS) return [];
+  const candidatos = [];
+  for(const h of HABITS.filter(h=>h.freq==='daily' && !h.graduado)){
+    const sums = await sumHabitsOverDays(GRADUACION_DIAS, [h.id]);
+    const cumplimiento = (sums[h.id]||0) / GRADUACION_DIAS;
+    if(cumplimiento >= GRADUACION_UMBRAL) candidatos.push(h);
+  }
+  return candidatos;
+}
+
+function dismissedToday(id){
+  try{ return localStorage.getItem('forja:grad-dismiss:'+id) === todayKey(); }catch(e){ return false; }
+}
+function dismissGraduacion(id){
+  try{ localStorage.setItem('forja:grad-dismiss:'+id, todayKey()); }catch(e){}
+  renderGraduacionBanner();
+}
+
+function renderGraduacionBanner(){
+  const el = document.getElementById('graduacionBanner');
+  const pendientes = graduacionCandidatos.filter(h=>!dismissedToday(h.id));
+  if(!pendientes.length){ el.innerHTML=''; return; }
+  el.innerHTML = pendientes.map(h => `
+    <div class="periodic-row active" data-id="${h.id}">
+      <div class="habit-info">
+        <div class="habit-name">Este hábito parece haberse vuelto consistente</div>
+        <div class="habit-sub">${h.label} · ¿Quieres graduarlo de Forja?</div>
+      </div>
+      <div class="periodic-btns">
+        <button data-grad="${h.id}" style="width:auto; padding:0 10px; background:var(--gold); color:var(--navy); border-color:var(--gold); font-weight:700;">Graduar</button>
+        <button data-dismiss="${h.id}" style="width:auto; padding:0 10px;">Ahora no</button>
+      </div>
+    </div>
+  `).join('');
+  el.querySelectorAll('[data-grad]').forEach(btn=>{
+    btn.addEventListener('click', ()=> graduarHabit(btn.getAttribute('data-grad')));
+  });
+  el.querySelectorAll('[data-dismiss]').forEach(btn=>{
+    btn.addEventListener('click', ()=> dismissGraduacion(btn.getAttribute('data-dismiss')));
+  });
+}
+
+async function graduarHabit(id){
+  const h = HABITS.find(x=>x.id===id);
+  if(!h) return;
+  h.graduado = true;
+  await saveHabits();
+  graduacionCandidatos = graduacionCandidatos.filter(x=>x.id!==id);
+  renderHeader(); renderHabits(); renderGraduacionBanner(); renderManageList();
+}
+
+// ── Actué con cabeza fría ────────────────────────────────────────────────
+// Registro voluntario, repetible, sin puntos y sin afectar el máximo del
+// día. No es un hábito: vive en su propia bitácora para poder consultar
+// su frecuencia en estadísticas.
+async function loadCabezaFria(){
+  try{ const raw = localStorage.getItem('forja:cabezafria'); return raw ? JSON.parse(raw) : []; }catch(e){ return []; }
+}
+async function saveCabezaFria(arr){
+  try{ localStorage.setItem('forja:cabezafria', JSON.stringify(arr)); }catch(e){}
+}
+async function registrarCabezaFria(nota){
+  const arr = await loadCabezaFria();
+  const now = new Date();
+  arr.push({
+    date: todayKey(),
+    time: String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0'),
+    note: (nota||'').trim()
+  });
+  await saveCabezaFria(arr);
+  pushLog('🧊 Actué con cabeza fría' + (nota && nota.trim() ? ': "'+nota.trim()+'"' : ''));
+}
+async function actualizarCabezaFriaHoy(){
+  const arr = await loadCabezaFria();
+  const hoy = arr.filter(e=>e.date===todayKey()).length;
+  document.getElementById('cabezaFriaHoy').textContent = hoy > 0 ? (hoy + (hoy===1?' vez hoy':' veces hoy')) : 'registro voluntario';
+}
+document.getElementById('cabezaFriaBtn').addEventListener('click', ()=>{
+  document.getElementById('cabezaFriaNota').value = '';
+  document.getElementById('cabezaFriaOverlay').style.display = 'flex';
+});
+document.getElementById('cabezaFriaCloseBtn').addEventListener('click', ()=>{
+  document.getElementById('cabezaFriaOverlay').style.display = 'none';
+});
+document.getElementById('cabezaFriaSaveBtn').addEventListener('click', async ()=>{
+  const nota = document.getElementById('cabezaFriaNota').value;
+  await registrarCabezaFria(nota);
+  document.getElementById('cabezaFriaOverlay').style.display = 'none';
+  await actualizarCabezaFriaHoy();
+});
 
 async function addHabitFromForm(){
   const nameInput = document.getElementById('habitNameInput');
@@ -754,7 +923,45 @@ function mondayOf(date){
   return d;
 }
 
+// Estadísticas de las actuaciones nuevas. Se muestran solo cuando hay
+// información suficiente para que el número no sea engañoso (ej. no
+// mostrar "0/30 días" el primer día de uso).
+async function renderNuevasMetricas(){
+  const el = document.getElementById('nuevasMetricas');
+  const idx = await loadIndex();
+  const rows = [];
+
+  const cf = await loadCabezaFria();
+  if(cf.length){
+    const esteMes = cf.filter(e=>e.date.slice(0,7)===todayKey().slice(0,7)).length;
+    rows.push(statRowHTML('Actué con cabeza fría', cf.length + (cf.length===1?' registro':' registros') + ' en total', null, esteMes + ' este mes'));
+  }
+
+  if(Object.keys(idx).length >= 1 && HABITS.some(h=>h.id==='primero-lo-incomodo')){
+    const dias = Math.min(GRADUACION_DIAS, Object.keys(idx).length);
+    const sums = await sumHabitsOverDays(dias, ['primero-lo-incomodo']);
+    const cumplidos = sums['primero-lo-incomodo']||0;
+    const pct = Math.round((cumplidos/dias)*100);
+    rows.push(statRowHTML('Primero lo incómodo', cumplidos+'/'+dias+' días', pct, 'cumplimiento reciente'));
+  }
+
+  if(HABITS.some(h=>h.id==='soltar-control')){
+    const sums = await sumHabitsOverDays(daysSinceMonday()+1, ['soltar-control']);
+    const veces = sums['soltar-control']||0;
+    rows.push(statRowHTML('Soltar control', veces + (veces===1?' vez':' veces'), null, 'esta semana'));
+  }
+
+  if(HABITS.some(h=>h.id==='construir-patrimonio')){
+    const sums = await sumHabitsOverDays(daysSinceMonthStart()+1, ['construir-patrimonio']);
+    const cumplido = (sums['construir-patrimonio']||0) > 0;
+    rows.push(statRowHTML('Construir patrimonio', cumplido ? 'Cumplido ✓' : 'Pendiente', null, 'este mes'));
+  }
+
+  el.innerHTML = rows.length ? `<div class="section-title">Nuevas actuaciones</div>` + rows.join('') : '';
+}
+
 async function renderStats(period){
+  await renderNuevasMetricas();
   const el = document.getElementById('statsList');
   const idx = await loadIndex();
   const entries = Object.keys(idx).map(k=>({key:k, pts:idx[k]})).sort((a,b)=> a.key < b.key ? 1 : -1);
@@ -848,6 +1055,7 @@ function statRowHTML(label, ptsLabel, pct, sub){
 async function init(){
   ensureName();
   HABITS = await loadHabits();
+  await migrarNuevasActuaciones();
   state = await loadDay(dayKey);
   recalcPoints();
   await rebuildIndexIfNeeded();
@@ -857,6 +1065,9 @@ async function init(){
   renderLog();
   await renderPeriodicHabits();
   await renderRings();
+  await actualizarCabezaFriaHoy();
+  graduacionCandidatos = await checkGraduaciones();
+  renderGraduacionBanner();
 }
 init();
 
