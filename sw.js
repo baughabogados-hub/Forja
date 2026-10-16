@@ -1,4 +1,4 @@
-const CACHE = 'forja-v5';
+const CACHE = 'forja-v6';
 const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './forja-push.js'];
 
 self.addEventListener('install', (e) => {

@@ -47,22 +47,6 @@ h1{font-family:'Fraunces',serif; font-weight:700; font-size:34px; margin:4px 0 2
 .subtab-btn{flex:1; background:var(--navy-2); border:1px solid var(--navy-3); color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:11.5px; padding:8px 4px; border-radius:7px; cursor:pointer;}
 .subtab-btn.active{background:var(--navy-3); color:var(--gold-light); border-color:var(--gold);}
 
-.chatbox{background:var(--navy-2); border:1px solid var(--navy-3); border-radius:10px; padding:10px; margin-bottom:18px;}
-.chatrow{display:flex; gap:8px;}
-#msgInput{flex:1; background:var(--navy); border:1px solid var(--navy-3); border-radius:8px; color:var(--text); font-family:'Inter',sans-serif; font-size:15px; padding:11px 12px; outline:none;}
-#msgInput:focus{border-color:var(--gold);}
-#micBtn, #sendBtn{border:none; border-radius:8px; font-family:'Inter',sans-serif; font-size:14px; cursor:pointer;}
-#micBtn{background:var(--navy); border:1px solid var(--navy-3); color:var(--parchment); width:44px; font-size:18px;}
-#micBtn.listening{background:var(--stamp); border-color:var(--stamp);}
-#sendBtn{background:var(--gold); color:var(--navy); font-weight:600; padding:0 16px;}
-.hint{font-size:11px; color:var(--muted); margin-top:8px; line-height:1.4;}
-
-.log{display:flex; flex-direction:column; gap:6px; max-height:180px; overflow-y:auto; margin-bottom:20px; padding-right:2px;}
-.log:empty{display:none;}
-.logline{font-size:13px; color:var(--parchment-dim); display:flex; gap:8px; align-items:baseline;}
-.logline .n{font-family:'JetBrains Mono',monospace; color:var(--gold); font-size:11px; flex-shrink:0;}
-.logline .t{font-family:'JetBrains Mono',monospace; color:var(--muted); font-size:11px; flex-shrink:0;}
-
 .section-title{font-family:'Fraunces',serif; font-size:15px; color:var(--gold-light); margin:0 0 10px; letter-spacing:.02em;}
 
 .habits{display:flex; flex-direction:column; gap:8px; margin-bottom:24px;}
@@ -88,6 +72,10 @@ h1{font-family:'Fraunces',serif; font-weight:700; font-size:34px; margin:4px 0 2
 .sleep-row{background:var(--navy-2); border:1px solid var(--navy-3); border-radius:9px; padding:12px; margin-bottom:24px; display:flex; align-items:center; gap:12px;}
 .sleep-row .habit-info{flex:1;}
 .sleep-val{font-family:'JetBrains Mono',monospace; font-size:20px; color:var(--gold-light); font-weight:600;}
+.sleep-form{display:flex; gap:6px; align-items:center; flex-shrink:0;}
+#sleepInput{width:64px; background:var(--navy); border:1px solid var(--navy-3); border-radius:8px; color:var(--text); font-family:'JetBrains Mono',monospace; font-size:15px; padding:8px; outline:none; text-align:center;}
+#sleepInput:focus{border-color:var(--gold);}
+#sleepSaveBtn{border:none; border-radius:8px; background:var(--gold); color:var(--navy); font-family:'Inter',sans-serif; font-size:13px; font-weight:600; padding:9px 12px; cursor:pointer;}
 
 .bitacora{margin-top:auto;}
 .rings{display:grid; grid-template-columns:repeat(7,1fr); gap:8px; margin-top:10px;}
@@ -170,17 +158,6 @@ footer{margin-top:24px; text-align:center; font-family:'JetBrains Mono',monospac
 
   <div id="viewToday">
 
-    <div class="chatbox">
-      <div class="chatrow">
-        <button id="micBtn" title="Dictar">🎙️</button>
-        <input id="msgInput" type="text" placeholder="Declara lo que hiciste…" autocomplete="off">
-        <button id="sendBtn">Asentar</button>
-      </div>
-      <div class="hint">Toca el 🎙️ del teclado de tu teléfono para dictar, o escribe. Ej: "ya hice ejercicio", "dormí 7 horas", "lavé ropa".</div>
-    </div>
-
-    <div class="log" id="log"></div>
-
     <div class="section-head">
       <div class="section-title">Actuaciones del día</div>
       <button class="edit-link" id="manageOpenBtn">editar hábitos</button>
@@ -219,8 +196,6 @@ footer{margin-top:24px; text-align:center; font-family:'JetBrains Mono',monospac
               </select>
             </div>
           </div>
-          <label>Palabras clave (opcional)</label>
-          <input id="habitKeywordsInput" type="text" placeholder="separadas, por, coma">
           <div class="manage-actions">
             <button id="manageCloseBtn">Cerrar</button>
             <button id="habitAddBtn">Agregar hábito</button>
@@ -235,6 +210,10 @@ footer{margin-top:24px; text-align:center; font-family:'JetBrains Mono',monospac
         <div class="habit-sub" id="sleepSub">sin registrar</div>
       </div>
       <div class="sleep-val" id="sleepVal">—</div>
+      <div class="sleep-form">
+        <input id="sleepInput" type="number" inputmode="decimal" min="0" max="16" step="0.5" placeholder="hrs" aria-label="Horas dormidas">
+        <button id="sleepSaveBtn">Anotar</button>
+      </div>
     </div>
 
     <div class="periodic-row" id="cabezaFriaBtn" style="cursor:pointer; margin-bottom:24px;">
@@ -540,17 +519,8 @@ async function sumHabitsOverDays(numDays, ids){
   return sums;
 }
 
-function renderLog(){
-  const el = document.getElementById('log');
-  el.innerHTML = state.messages.map((m,i)=>`
-    <div class="logline"><span class="n">${String(i+1).padStart(2,'0')}</span><span class="t">${m.time}</span><span>${m.text}</span></div>
-  `).join('');
-  el.scrollTop = el.scrollHeight;
-}
-
-async function toggleHabit(id, fromParse=false){
+async function toggleHabit(id){
   const wasDone = !!state.habitsDone[id];
-  if(fromParse && wasDone) return false; // ya sellado hoy, no duplicar
   state.habitsDone[id] = wasDone ? 0 : 1;
   recalcPoints();
   renderHeader(); renderHabits();
@@ -558,7 +528,7 @@ async function toggleHabit(id, fromParse=false){
   return true;
 }
 
-async function incrementHabit(id, fromParse=false){
+async function incrementHabit(id){
   state.habitsDone[id] = (state.habitsDone[id]||0) + 1;
   recalcPoints();
   renderHeader();
@@ -582,93 +552,24 @@ async function setSleep(hours){
   await saveDay(dayKey, state);
 }
 
-function pushLog(text){
-  const now = new Date();
-  const time = String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
-  state.messages.push({text, time});
-  renderLog();
-}
-
-async function handleMessage(raw){
-  const text = raw.trim();
-  if(!text) return;
-  const n = norm(text);
-  let matched = [];
-
-  for(const h of HABITS.filter(h=>!h.graduado)){
-    if(h.kw.some(k=>n.includes(norm(k)))){
-      if(h.freq === 'daily'){
-        const changed = await toggleHabit(h.id, true);
-        if(changed) matched.push(h.label);
-      } else {
-        await incrementHabit(h.id, true);
-        matched.push(h.label);
-      }
-    }
-  }
-
-  const sleepMatch = n.match(/(\d{1,2}(?:\.\d)?)\s*(?:h|hr|hora|horas)/);
-  if(sleepMatch && (n.includes('dormi') || n.includes('sueno') || n.includes('dormir'))){
-    const hrs = parseFloat(sleepMatch[1]);
-    if(!isNaN(hrs) && hrs > 0 && hrs <= 16){
-      await setSleep(hrs);
-      matched.push('Sueño: ' + hrs + 'h');
-    }
-  }
-
-  if(matched.length){
-    pushLog('"' + text + '" → sellado: ' + matched.join(', '));
-    await saveDay(dayKey, state);
-    await renderRings();
+// Registro de sueño: se anota a mano. Vacío borra el registro de hoy.
+async function anotarSueno(){
+  const inp = document.getElementById('sleepInput');
+  const txt = inp.value.trim().replace(',', '.');
+  if(txt === ''){
+    await setSleep(null);
   } else {
-    pushLog('"' + text + '" → no se reconoció ninguna actividad. Puedes tocar la fila manualmente.');
+    const hrs = parseFloat(txt);
+    if(isNaN(hrs) || hrs < 0 || hrs > 16){ inp.focus(); return; }
+    await setSleep(Math.round(hrs * 2) / 2);
   }
-}
-
-document.getElementById('sendBtn').addEventListener('click', ()=>{
-  const inp = document.getElementById('msgInput');
-  handleMessage(inp.value);
   inp.value = '';
-  inp.focus();
-});
-document.getElementById('msgInput').addEventListener('keydown', (e)=>{
-  if(e.key === 'Enter'){
-    document.getElementById('sendBtn').click();
-  }
-});
-
-// Reconocimiento de voz: mejora progresiva, con respaldo en el dictado del teclado
-const micBtn = document.getElementById('micBtn');
-let recognition = null;
-try{
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if(SR){
-    recognition = new SR();
-    recognition.lang = 'es-MX';
-    recognition.interimResults = false;
-    recognition.onresult = (e)=>{
-      const transcript = e.results[0][0].transcript;
-      document.getElementById('msgInput').value = transcript;
-      handleMessage(transcript);
-      document.getElementById('msgInput').value = '';
-    };
-    recognition.onend = ()=> micBtn.classList.remove('listening');
-    recognition.onerror = ()=>{ micBtn.classList.remove('listening'); document.getElementById('msgInput').focus(); };
-  }
-}catch(e){ recognition = null; }
-
-micBtn.addEventListener('click', ()=>{
-  if(recognition){
-    try{
-      micBtn.classList.add('listening');
-      recognition.start();
-    }catch(e){
-      micBtn.classList.remove('listening');
-      document.getElementById('msgInput').focus();
-    }
-  } else {
-    document.getElementById('msgInput').focus();
-  }
+  inp.blur();
+  await renderRings();
+}
+document.getElementById('sleepSaveBtn').addEventListener('click', anotarSueno);
+document.getElementById('sleepInput').addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter') anotarSueno();
 });
 
 // Bitácora de 21 días
@@ -835,7 +736,6 @@ async function registrarCabezaFria(nota){
     note: (nota||'').trim()
   });
   await saveCabezaFria(arr);
-  pushLog('🧊 Actué con cabeza fría' + (nota && nota.trim() ? ': "'+nota.trim()+'"' : ''));
 }
 async function actualizarCabezaFriaHoy(){
   const arr = await loadCabezaFria();
@@ -859,20 +759,18 @@ document.getElementById('cabezaFriaSaveBtn').addEventListener('click', async ()=
 async function addHabitFromForm(){
   const nameInput = document.getElementById('habitNameInput');
   const ptsInput = document.getElementById('habitPointsInput');
-  const kwInput = document.getElementById('habitKeywordsInput');
   const freqInput = document.getElementById('habitFreqInput');
   const name = nameInput.value.trim();
   let pts = parseInt(ptsInput.value, 10);
   if(!name) return;
   if(isNaN(pts) || pts <= 0) pts = 10;
-  let kw = kwInput.value.split(',').map(s=>s.trim()).filter(Boolean);
-  if(kw.length === 0) kw = [name];
+  const kw = [name];
   const id = slugify(name);
   const freq = freqInput.value || 'daily';
   HABITS.push({id, label:name, points:pts, freq, kw});
   await saveHabits();
   renderHeader(); renderHabits(); renderManageList(); await renderPeriodicHabits(); await renderRings();
-  nameInput.value=''; ptsInput.value=''; kwInput.value=''; freqInput.value='daily';
+  nameInput.value=''; ptsInput.value=''; freqInput.value='daily';
   nameInput.focus();
 }
 
@@ -1062,7 +960,6 @@ async function init(){
   await updateIndex(dayKey, state.points);
   renderHeader();
   renderHabits();
-  renderLog();
   await renderPeriodicHabits();
   await renderRings();
   await actualizarCabezaFriaHoy();

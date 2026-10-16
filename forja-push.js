@@ -10,7 +10,7 @@
   'use strict';
 
   var SERVIDOR = 'https://diplomatic-caring-production-d61b.up.railway.app';
-  var HORARIOS = '07:30,15:00,22:30';
+  var HORARIOS = '23:00';
   var UMBRAL_CERRADO = 0.7; // mismo umbral que el anillo dorado de la bitácora
 
   /* ---------------- utilidades ---------------- */
@@ -166,6 +166,29 @@
       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   }
 
+  function registrar(sub) {
+    return fetch(SERVIDOR + '/suscribir', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        subscription: sub.toJSON(),
+        nombre: nombre(),
+        zona: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        horarios: HORARIOS
+      })
+    });
+  }
+
+  // Un teléfono suscrito con el horario anterior se actualiza solo: el
+  // servidor guarda la suscripción por endpoint y sobrescribe los horarios.
+  function sincronizarHorarios() {
+    if (!soportado()) return;
+    navigator.serviceWorker.ready
+      .then(function (reg) { return reg.pushManager.getSubscription(); })
+      .then(function (sub) { if (sub) return registrar(sub); })
+      .catch(function () {});
+  }
+
   function activar() {
     if (!soportado()) return Promise.reject(new Error('Este navegador no admite avisos.'));
     if (esIOS() && !instalada()) {
@@ -186,18 +209,7 @@
             });
           });
       })
-      .then(function (sub) {
-        return fetch(SERVIDOR + '/suscribir', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            subscription: sub.toJSON(),
-            nombre: nombre(),
-            zona: Intl.DateTimeFormat().resolvedOptions().timeZone,
-            horarios: HORARIOS
-          })
-        });
-      })
+      .then(registrar)
       .then(function (r) {
         if (!r.ok) throw new Error('El servidor rechazó la suscripción.');
         return espejear();
@@ -272,7 +284,7 @@
       '<div class="forja-avisos__fila">' +
       '<div class="forja-avisos__info">' +
       '<div class="forja-avisos__t">Avisos</div>' +
-      '<div class="forja-avisos__s" id="forjaAvisosNota">07:30 · 15:00 · 22:30</div>' +
+      '<div class="forja-avisos__s" id="forjaAvisosNota">' + HORARIOS + '</div>' +
       '</div>' +
       '<button class="forja-avisos__b" id="forjaAvisosBtn">Activar</button>' +
       '</div>';
@@ -288,8 +300,8 @@
       boton.dataset.activo = activo ? '1' : '0';
       caja.classList.toggle('on', !!activo);
       nota.textContent = activo
-        ? 'activos · 07:30 · 15:00 · 22:30'
-        : '07:30 · 15:00 · 22:30';
+        ? 'activo · ' + HORARIOS
+        : HORARIOS;
     }
 
     boton.addEventListener('click', function () {
@@ -315,6 +327,7 @@
   function arrancar() {
     montar();
     espejear();
+    sincronizarHorarios();
     // Vuelve a espejear cuando el usuario toca algo o regresa a la app.
     document.addEventListener('click', function () { setTimeout(espejear, 250); }, true);
     document.addEventListener('visibilitychange', function () {
